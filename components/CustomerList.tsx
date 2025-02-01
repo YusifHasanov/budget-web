@@ -17,6 +17,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {useRouter} from "next/router";
 
 interface Customer {
     id: number
@@ -32,7 +33,7 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Customer>("name")
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-
+    const router = useRouter()
     // Filter customers based on search input
 
     const filteredCustomers = customers ?? [].filter(
@@ -59,7 +60,7 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
     }
 
     const handleViewDetails = (id: number) => {
-        window.location.href = `/customer/${id}`
+        router.push(`/customers/${id}`)
     }
 
     const handleEditCustomer = (id: number) => {
