@@ -89,7 +89,7 @@ function TotalCard({
                        type,
                        isLoading,
                    }: { title: string; amount: number; type: "income" | "outcome"; isLoading: boolean }) {
-
+console.log(type)
     return (
         <Card>
             <CardHeader>
