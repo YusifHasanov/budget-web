@@ -24,7 +24,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   return (
     <main className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <DateRangePicker date={dateRange} setDate={setDateRange} />
+        <DateRangePicker date={dateRange} setDate={setDateRange  as any }/>
         <Dialog open={isUpdateCustomerDialogOpen} onOpenChange={setIsUpdateCustomerDialogOpen}>
           <DialogTrigger asChild>
             <Button>Update Customer</Button>
