@@ -19,7 +19,7 @@ export function CustomerDetails({ customerId, dateRange }: { customerId: string;
   }, [customerId])
 
   const fetchCustomerDetails = async () => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/report/cashflow?customerId=${customerId}`)
+    fetch(`/base-api/report/cashflow?customerId=${customerId}`)
         .then(res => res.json())
         .then(data => {
           setDetails(data.data)

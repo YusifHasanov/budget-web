@@ -29,7 +29,7 @@ export default function Home() {
     }
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer`)
+        fetch(`/base-api/customer`)
             .then(res => res.json())
             .then(data => {
                 console.log("data", data.data)
@@ -42,7 +42,7 @@ export default function Home() {
     }, [])
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/report/total-cashflow`)
+        fetch(`/base-api/report/total-cashflow`)
             .then(res => res.json())
             .then(data => {
                 setTotalData(data.data)

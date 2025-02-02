@@ -21,6 +21,16 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/base-api/:path*',
+        // destination: 'http://31.220.95.127:8083/api/:path*',
+        //  destination: 'http://localhost:8083/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
+      },
+    ];
+  },
 }
 
 mergeConfig(nextConfig, userConfig)
