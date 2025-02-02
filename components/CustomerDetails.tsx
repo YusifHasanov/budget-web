@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AddTransactionForm } from "@/components/AddTransactionForm"
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 import type { DateRange } from "react-day-picker"
+import { Skeleton } from "@/components/ui/skeleton" // Skeleton bileşenini ekledik
 
 
 export function CustomerDetails({ customerId, dateRange }: { customerId: string; dateRange: DateRange }) {
@@ -32,84 +33,126 @@ export function CustomerDetails({ customerId, dateRange }: { customerId: string;
     setIsDialogOpen(false)
   }
 
-  if (!details) return <div>Loading...</div>
+  if (!details) return (
+      <div className="space-y-6">
+        {/* Skeleton for Customer Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle><Skeleton className="h-6 w-40" /></CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <Skeleton className="h-24 w-full rounded-lg" />
+              <Skeleton className="h-24 w-full rounded-lg" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Skeleton for Transactions Table */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle><Skeleton className="h-6 w-32" /></CardTitle>
+            <Skeleton className="h-8 w-40 rounded" />
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+                  <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+                  <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...Array(2)].map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                    </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+  )
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Customer Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div className="bg-green-100 p-4 rounded-lg">
-              <p className="font-semibold text-green-800">Ümumi Gəlir</p>
-              <p className="text-2xl font-bold text-green-600">{details.totalPaid.toFixed(2)}₼</p>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="bg-green-100 p-4 rounded-lg">
+                <p className="font-semibold text-green-800">Ümumi Gəlir</p>
+                <p className="text-2xl font-bold text-green-600">{details.totalPaid.toFixed(2)}₼</p>
+              </div>
+              <div className="bg-red-100 p-4 rounded-lg">
+                <p className="font-semibold text-red-800">Ümumi Xərc</p>
+                <p className="text-2xl font-bold text-red-600">{details.totalDebt.toFixed(2)}₼</p>
+              </div>
             </div>
-            <div className="bg-red-100 p-4 rounded-lg">
-              <p className="font-semibold text-red-800">Ümumi Xərc</p>
-              <p className="text-2xl font-bold text-red-600">{details.totalDebt.toFixed(2)}₼</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Transaksiyalar</CardTitle>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>Yenisini əlavə et</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Yeni Proses əlavə et</DialogTitle>
-              </DialogHeader>
-              <AddTransactionForm customerId={customerId} onTransactionAdded={handleTransactionAdded} />
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tarix</TableHead>
-                <TableHead>Borc</TableHead>
-                <TableHead>Ödəniş</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {details.transactions.map((transaction : any, index : any) => (
-                <TableRow key={index}>
-                  <TableCell> {new Date(transaction.paymentDate).toLocaleString("en-GB", {
-                    hour12: false,
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  })}</TableCell>
-                  <TableCell className={transaction.eventType === 0 ? "text-red-600" : ""}>
-                    {transaction.eventType === 0 ? (
-                      <span className="flex items-center">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Transaksiyalar</CardTitle>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>Yenisini əlavə et</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Yeni Proses əlavə et</DialogTitle>
+                </DialogHeader>
+                <AddTransactionForm customerId={customerId} onTransactionAdded={handleTransactionAdded} />
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tarix</TableHead>
+                  <TableHead>Borc</TableHead>
+                  <TableHead>Ödəniş</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {details.transactions.map((transaction : any, index : any) => (
+                    <TableRow key={index}>
+                      <TableCell> {new Date(transaction.paymentDate).toLocaleString("en-GB", {
+                        hour12: false,
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}</TableCell>
+                      <TableCell className={transaction.eventType === 0 ? "text-red-600" : ""}>
+                        {transaction.eventType === 0 ? (
+                            <span className="flex items-center">
                         <ArrowDownIcon className="mr-1" size={16} />{transaction.amount.toFixed(2)}₼
                       </span>
-                    ) : null}
-                  </TableCell>
-                  <TableCell className={transaction.eventType === 1 ? "text-green-600" : ""}>
-                    {transaction.eventType === 1 ? (
-                      <span className="flex items-center">
+                        ) : null}
+                      </TableCell>
+                      <TableCell className={transaction.eventType === 1 ? "text-green-600" : ""}>
+                        {transaction.eventType === 1 ? (
+                            <span className="flex items-center">
                         <ArrowUpIcon className="mr-1" size={16} />{transaction.amount.toFixed(2)}₼
                       </span>
-                    ) : null}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+                        ) : null}
+                      </TableCell>
+                    </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
   )
 }
-

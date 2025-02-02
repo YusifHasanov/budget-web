@@ -62,7 +62,7 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
 
 
     const handleViewDetails = (id: number) => {
-        router.push(`/customers/${id}`)
+        router.push(`/customer/${id}`)
     }
 
     const handleEditCustomer = (id: number) => {
@@ -94,22 +94,22 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[100px]">ID</TableHead>
-                                <TableHead>
+                                <TableHead className="w-[80px]">ID</TableHead>
+                                <TableHead className="w-[250px]">
                                     <Button variant="ghost" onClick={() => handleSort("name")}>
-                                        Name
+                                        Ad
                                         <ArrowUpDown className="ml-2 h-4 w-4"/>
                                     </Button>
                                 </TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead>Address</TableHead>
-                                <TableHead className="w-[120px]">
+                                <TableHead className="w-[150px]">
                                     <Button variant="ghost" onClick={() => handleSort("totalDebt")}>
-                                        Total Debt
+                                        Ümumi Borcu
                                         <ArrowUpDown className="ml-2 h-4 w-4"/>
                                     </Button>
                                 </TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="w-[250px]">Address</TableHead>
+                                <TableHead className="w-[150px] text-right"></TableHead>
+                                <TableHead className="w-[150px] text-center">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -123,10 +123,10 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
                                             <Skeleton className="h-4 w-[200px]"/>
                                         </TableCell>
                                         <TableCell>
-                                            <Skeleton className="h-4 w-[300px]"/>
+                                            <Skeleton className="h-4 w-[150px]"/>
                                         </TableCell>
                                         <TableCell>
-                                            <Skeleton className="h-4 w-[150px]"/>
+                                            <Skeleton className="h-4 w-[250px]"/>
                                         </TableCell>
                                         <TableCell>
                                             <Skeleton className="h-4 w-16"/>
@@ -147,14 +147,18 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
                                                 {customer.name}
                                             </Link>
                                         </TableCell>
-                                        <TableCell>{customer.description}</TableCell>
-                                        <TableCell>{customer.address || "N/A"}</TableCell>
                                         <TableCell>
-                                            <Badge variant={customer.totalDebt > 0 ? "destructive" : "secondary"}>
+                                            <Badge className={"text-md"} variant={customer.totalDebt > 0 ? "destructive" : "secondary"}>
                                                 {customer.totalDebt.toFixed(2)}₼
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell>{customer.address || "N/A"}</TableCell>
+                                        <TableCell className="text-right flex space-x-2">
+                                            <Button variant="outline" size="sm" onClick={() => handleViewDetails(customer.id)}>
+                                                Detallar
+                                            </Button>
+                                        </TableCell>
+                                        <TableCell className={"text-center"}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
