@@ -19,7 +19,7 @@ export function AddCustomerForm({ onCustomerAdded }: AddCustomerFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const response = await fetch(`/base-api/customers`, {
+    const response = await fetch(`/base-api/customer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

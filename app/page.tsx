@@ -21,10 +21,11 @@ export default function Home() {
     const [isTotalLoading, setIsTotalLoading] = useState(true)
     const [responseData, setResponseData] = useState([] as any)
     const [totalData, setTotalData] = useState({} as any)
-
+    const [i,setI] = useState<number>(0)
     const handleCustomerAdded = () => {
 
         setIsAddCustomerDialogOpen(false)
+        setI(prev=>prev+1);
         // You might want to refresh the customer list here
     }
 
@@ -39,7 +40,7 @@ export default function Home() {
             })
             .catch(err => console.log(err))
 
-    }, [])
+    }, [i])
 
     useEffect(() => {
         fetch(`/base-api/report/total-cashflow`)
