@@ -62,28 +62,55 @@ export default function Home() {
                 </h1>
 
                 {/* Tarih Aralığı Seçici */}
-                <div className="w-full sm:w-auto">
-                    <DateRangePicker date={dateRange} setDate={setDateRange as any}/>
-                </div>
+                <div className={"flex sm:flex-row flex-col"}>
 
-                {/* Dialog */}
-                <Dialog open={isAddCustomerDialogOpen} onOpenChange={setIsAddCustomerDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="w-full sm:w-auto">
-                            <PlusCircle className="mr-2 h-4 w-4"/>
-                            Yeni müştəri əlavə et
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="w-full sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Yeni müştəri əlavə et</DialogTitle>
-                        </DialogHeader>
-                        <AddCustomerForm onCustomerAdded={handleCustomerAdded}/>
-                    </DialogContent>
-                </Dialog>
+                    <div className="w-full mb-2 sm:w-auto">
+                        <DateRangePicker date={dateRange} setDate={setDateRange as any}/>
+                    </div>
+
+                    {/* Dialog */}
+                    <Dialog open={isAddCustomerDialogOpen} onOpenChange={setIsAddCustomerDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="w-full sm:w-auto">
+                                <PlusCircle className="mr-2 h-4 w-4"/>
+                                Yeni müştəri əlavə et
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="w-full sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Yeni müştəri əlavə et</DialogTitle>
+                            </DialogHeader>
+                            <AddCustomerForm onCustomerAdded={handleCustomerAdded}/>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
-                {totalData?.totalPaid && totalData?.totalDebt && (
+            <div className="">
+
+                <Card className="shadow-lg ml-auto mr-auto rounded-xl">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-bold text-center">Maliyyə Xülasəsi</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                        {[
+                            {title: "Ümumi Gəlir", amount: totalData.totalPaid, type: "income"},
+                            {title: "Fərq", amount: totalData.totalPaid - totalData.totalDebt, type: "outcome"},
+                            {title: "Ümumi Xərc", amount: totalData.totalDebt, type: "outcome"},
+                        ].map(({title, amount, type}, index) => (
+                            <div key={index} className="flex sm:flex-col w-full justify-between items-center">
+                                <span className="text-gray-600 text-sm">{title}</span>
+                                {isTotalLoading ? (
+                                    <Skeleton className="h-8 w-24 mt-2" />
+                                ) : (
+                                    <p className={`text-2xl font-bold mt-1 ${type === "income" ? "text-green-600" : "text-red-600"}`}>
+                                        {amount.toFixed(2)}₼
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+                {totalData?.totalPaid && false && totalData?.totalDebt && (
                     <>
                         <TotalCard title="Ümumi Gəlir" amount={totalData?.totalPaid} type="income"
                                    isLoading={isTotalLoading}/>
@@ -107,15 +134,15 @@ function TotalCard({
                    }: { title: string; amount: number; type: "income" | "outcome"; isLoading: boolean }) {
     console.log(type)
     return (
-        <Card>
+        <Card className={"flex items-center"}>
             <CardHeader>
                 <CardTitle>{title}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className={"p-0"}>
                 {isLoading ? (
                     <Skeleton className="h-8 w-24"/>
                 ) : (
-                    <p className={`text-3xl font-bold ${type === "income" ? "text-green-600" : "text-red-600"}`}>
+                    <p className={`text-3xl p-0 font-bold ${type === "income" ? "text-green-600" : "text-red-600"}`}>
                         {amount.toFixed(2)}₼
                     </p>
                 )}
