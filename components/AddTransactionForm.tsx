@@ -18,7 +18,7 @@ export function AddTransactionForm({ customerId, onTransactionAdded }: AddTransa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const response = await fetch(`/api/customers/${customerId}/transactions`, {
+    const response = await fetch(`/base-api/customer/${customerId}/${eventType == "0" ? "add-debt": "pay-debt"}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: Number.parseFloat(amount), eventType: Number.parseInt(eventType) }),

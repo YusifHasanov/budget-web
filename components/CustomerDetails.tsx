@@ -85,13 +85,17 @@ export function CustomerDetails({ customerId, dateRange }: { customerId: string;
             <CardTitle>Customer Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-center">
+            <div className="grid grid-cols-3 gap-4 text-center">
               <div className="bg-green-100 p-4 rounded-lg">
                 <p className="font-semibold text-green-800">Ümumi Gəlir</p>
                 <p className="text-2xl font-bold text-green-600">{details.totalPaid.toFixed(2)}₼</p>
               </div>
               <div className="bg-red-100 p-4 rounded-lg">
-                <p className="font-semibold text-red-800">Ümumi Xərc</p>
+                <p className="font-semibold text-red-800">Hazırki Borc</p>
+                <p className="text-2xl font-bold text-red-600">{details.currentDebt.toFixed(2)}₼</p>
+              </div>
+              <div className="bg-red-100 p-4 rounded-lg">
+                <p className="font-semibold text-red-800">Ümumi Verilən borc</p>
                 <p className="text-2xl font-bold text-red-600">{details.totalDebt.toFixed(2)}₼</p>
               </div>
             </div>

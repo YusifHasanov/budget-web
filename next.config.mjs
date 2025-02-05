@@ -27,7 +27,7 @@ const nextConfig = {
         source: '/base-api/:path*',
         // destination: 'http://31.220.95.127:8083/api/:path*',
         //  destination: 'http://localhost:8083/api/:path*',
-        destination: `http://213.199.46.212:8084/api/v1/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
       },
       {
         source: "/sitemap.xml",

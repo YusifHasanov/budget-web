@@ -21,11 +21,11 @@ export default function Home() {
     const [isTotalLoading, setIsTotalLoading] = useState(true)
     const [responseData, setResponseData] = useState([] as any)
     const [totalData, setTotalData] = useState({} as any)
-    const [i,setI] = useState<number>(0)
+    const [i, setI] = useState<number>(0)
     const handleCustomerAdded = () => {
 
         setIsAddCustomerDialogOpen(false)
-        setI(prev=>prev+1);
+        setI(prev => prev + 1);
         // You might want to refresh the customer list here
     }
 
@@ -50,7 +50,7 @@ export default function Home() {
                 setIsTotalLoading(false)
             })
             .catch(err => console.log(err))
-    }, [])
+    }, [i])
 
 
     return (
@@ -75,9 +75,17 @@ export default function Home() {
                     </Dialog>
                 </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-                <TotalCard title="Ümumi Gəlir" amount={totalData?.totalPaid} type="income" isLoading={isTotalLoading}/>
-                <TotalCard title="Ümumi Xərc" amount={totalData?.totalDebt} type="outcome" isLoading={isTotalLoading}/>
+            <div className="grid md:grid-cols-3 gap-6">
+                {totalData?.totalPaid && totalData?.totalDebt && (
+                    <>
+                        <TotalCard title="Ümumi Gəlir" amount={totalData?.totalPaid} type="income"
+                                   isLoading={isTotalLoading}/>
+                        <TotalCard title="Fərq" amount={totalData?.totalPaid - totalData?.totalDebt} type="outcome"
+                                   isLoading={isTotalLoading}/>
+                        <TotalCard title="Ümumi Xərc" amount={totalData?.totalDebt} type="outcome"
+                                   isLoading={isTotalLoading}/>
+                    </>
+                )}
             </div>
             <CustomerList customers={responseData} isLoading={isLoading}/>
         </main>
@@ -90,7 +98,7 @@ function TotalCard({
                        type,
                        isLoading,
                    }: { title: string; amount: number; type: "income" | "outcome"; isLoading: boolean }) {
-console.log(type)
+    console.log(type)
     return (
         <Card>
             <CardHeader>
