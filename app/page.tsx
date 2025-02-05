@@ -55,25 +55,32 @@ export default function Home() {
 
     return (
         <main className="container mx-auto p-4 space-y-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Customer Management</h1>
-                <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+                {/* Başlık */}
+                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">
+                    Customer Management
+                </h1>
+
+                {/* Tarih Aralığı Seçici */}
+                <div className="w-full sm:w-auto">
                     <DateRangePicker date={dateRange} setDate={setDateRange as any}/>
-                    <Dialog open={isAddCustomerDialogOpen} onOpenChange={setIsAddCustomerDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <PlusCircle className="mr-2 h-4 w-4"/>
-                                Yeni müştəri əlavə et
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Yeni müştəri əlavə et</DialogTitle>
-                            </DialogHeader>
-                            <AddCustomerForm onCustomerAdded={handleCustomerAdded}/>
-                        </DialogContent>
-                    </Dialog>
                 </div>
+
+                {/* Dialog */}
+                <Dialog open={isAddCustomerDialogOpen} onOpenChange={setIsAddCustomerDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="w-full sm:w-auto">
+                            <PlusCircle className="mr-2 h-4 w-4"/>
+                            Yeni müştəri əlavə et
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-full sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Yeni müştəri əlavə et</DialogTitle>
+                        </DialogHeader>
+                        <AddCustomerForm onCustomerAdded={handleCustomerAdded}/>
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
                 {totalData?.totalPaid && totalData?.totalDebt && (
