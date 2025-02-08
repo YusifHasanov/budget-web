@@ -86,7 +86,7 @@ export function CustomerList({customers, isLoading}: { customers: Customer[], is
                 {sortedCustomers.map((customer) => (
                     <Card key={customer.id}  className="shadow-lg p-4 flex justify-between items-center rounded-2xl">
                         <CardContent className="w-full p-0 flex justify-between items-center">
-                            <span onClick={()=>handleViewDetails(customer.id)} className="text-lg hover:text-blue-600 font-medium">{customer.name}</span>
+                            <span onClick={()=>handleViewDetails(customer.id)} className="text-lg hover:cursor-pointer hover:text-blue-600 font-medium">{customer.name}</span>
                             <Badge
                                 className={`text-sm px-3 py-1 rounded-lg ${customer.currentDebt > 0 ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}
                             >
