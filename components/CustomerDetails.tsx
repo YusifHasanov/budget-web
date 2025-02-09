@@ -91,7 +91,7 @@ export function CustomerDetails({customerId, dateRange}: { customerId: string; d
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Customer Summary</CardTitle>
+                    <CardTitle> {details.name} {details.address}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-3 gap-4 text-center">

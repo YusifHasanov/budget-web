@@ -110,16 +110,16 @@ export default function Home() {
                         ))}
                     </CardContent>
                 </Card>
-                {totalData?.totalPaid && false && totalData?.totalDebt && (
-                    <>
-                        <TotalCard title="Ümumi Gəlir" amount={totalData?.totalPaid} type="income"
-                                   isLoading={isTotalLoading}/>
-                        <TotalCard title="Fərq" amount={totalData?.totalPaid - totalData?.totalDebt} type="outcome"
-                                   isLoading={isTotalLoading}/>
-                        <TotalCard title="Ümumi Xərc" amount={totalData?.totalDebt} type="outcome"
-                                   isLoading={isTotalLoading}/>
-                    </>
-                )}
+                {/*{totalData?.totalPaid && false && totalData?.totalDebt && (*/}
+                {/*    <>*/}
+                {/*        <TotalCard title="Ümumi Gəlir" amount={totalData?.totalPaid} type="income"*/}
+                {/*                   isLoading={isTotalLoading}/>*/}
+                {/*        <TotalCard title="Fərq" amount={totalData?.totalPaid - totalData?.totalDebt} type="outcome"*/}
+                {/*                   isLoading={isTotalLoading}/>*/}
+                {/*        <TotalCard title="Ümumi Xərc" amount={totalData?.totalDebt} type="outcome"*/}
+                {/*                   isLoading={isTotalLoading}/>*/}
+                {/*    </>*/}
+                {/*)}*/}
             </div>
             <CustomerList customers={responseData} isLoading={isLoading}/>
         </main>

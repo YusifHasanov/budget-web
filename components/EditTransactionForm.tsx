@@ -13,10 +13,10 @@ export function EditTransactionForm({ transaction, onTransactionEdited, onCancel
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await fetch(`/base-api/customer/${transaction.id}`, {
+            const response = await fetch(`/base-api/customer/update-debt/${transaction.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount, eventType: Number.parseInt(eventType), paymentDate }),
+                body: JSON.stringify({ amount, eventType: Number.parseInt(eventType), debtDate: paymentDate }),
             })
             if (response.ok) {
                 onTransactionEdited()
