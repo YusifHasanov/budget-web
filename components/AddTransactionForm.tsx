@@ -43,7 +43,7 @@ export function AddTransactionForm({ customerId, onTransactionAdded }) {
         />
         <Select value={eventType} onValueChange={setEventType}>
           <SelectTrigger>
-            <SelectValue placeholder="Select event type" />
+            <SelectValue placeholder="Sec event type" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="0">Borc elave et</SelectItem>
@@ -51,7 +51,7 @@ export function AddTransactionForm({ customerId, onTransactionAdded }) {
           </SelectContent>
         </Select>
         <Input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} />
-        <Button type="submit">Add Transaction</Button>
+        <Button type="submit">Elave et</Button>
       </form>
   )
 }
