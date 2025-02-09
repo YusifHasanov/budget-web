@@ -62,13 +62,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             </Dialog>
 
             {/* Delete Customer Dialog */}
-            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <Dialog  open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="destructive">Delete Customer</Button>
+                <Button variant="destructive">Musterini sil </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Are you sure you want to delete this customer?</DialogTitle>
+                  <DialogTitle>Silmek istediyinize eminsiniz??</DialogTitle>
                 </DialogHeader>
                 <DialogFooter className="flex justify-end space-x-2">
                   <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
@@ -79,7 +79,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                       onClick={handleDeleteCustomer}
                       disabled={isDeleting}
                   >
-                    {isDeleting ? "Deleting..." : "Yes, Delete"}
+                    {isDeleting ? "Silinir..." : "Beli, Sil"}
                   </Button>
                 </DialogFooter>
               </DialogContent>

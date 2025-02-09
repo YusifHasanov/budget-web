@@ -41,8 +41,8 @@ export function EditTransactionForm({ transaction, onTransactionEdited, onCancel
                     <SelectValue placeholder="Select event type" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="0">Debt</SelectItem>
-                    <SelectItem value="1">Payment</SelectItem>
+                    <SelectItem value="0">Borc </SelectItem>
+                    <SelectItem value="1">Odenis</SelectItem>
                 </SelectContent>
             </Select>
             <Input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} />

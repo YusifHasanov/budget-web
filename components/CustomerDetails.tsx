@@ -113,7 +113,7 @@ export function CustomerDetails({customerId, dateRange}: { customerId: string; d
 
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Transaksiyalar</CardTitle>
+                    <CardTitle className={"mr-2"}>Transaksiyalar</CardTitle>
                     <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                         <DialogTrigger asChild>
                             <Button>Yenisini əlavə et</Button>
