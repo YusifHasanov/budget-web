@@ -96,16 +96,16 @@ export function CustomerDetails({customerId, dateRange}: { customerId: string; d
                 <CardContent>
                     <div className="grid grid-cols-3 gap-4 text-center">
                         <div className="bg-green-100 p-4 rounded-lg">
-                            <p className="font-semibold text-green-800">Ümumi Gəlir</p>
-                            <p className="text-2xl font-bold text-green-600">{details.totalPaid.toFixed(2)}₼</p>
+                            <p className="font-semibold text-sm sm:text-2xl text-green-800">Ümumi Gəlir</p>
+                            <p className="text-md sm:text-2xl font-bold text-green-600">{details.totalPaid.toFixed(2)}₼</p>
                         </div>
                         <div className="bg-red-100 p-4 rounded-lg">
-                            <p className="font-semibold text-red-800">Hazırki Borc</p>
-                            <p className="text-2xl font-bold text-red-600">{details.currentDebt.toFixed(2)}₼</p>
+                            <p className="font-semibold text-sm  sm:text-2xl text-red-800">Hazırki Borc</p>
+                            <p className="text-md sm:text-2xl  font-bold text-red-600">{details.currentDebt.toFixed(2)}₼</p>
                         </div>
                         <div className="bg-red-100 p-4 rounded-lg">
-                            <p className="font-semibold text-red-800">Ümumi Verilən borc</p>
-                            <p className="text-2xl font-bold text-red-600">{details.totalDebt.toFixed(2)}₼</p>
+                            <p className="font-semibold text-sm  sm:text-2xl text-red-800">Ümumi borc</p>
+                            <p className="text-md sm:text-2xl  font-bold text-red-600">{details.totalDebt.toFixed(2)}₼</p>
                         </div>
                     </div>
                 </CardContent>
@@ -126,13 +126,12 @@ export function CustomerDetails({customerId, dateRange}: { customerId: string; d
                         </DialogContent>
                     </Dialog>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-0">
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Tarix</TableHead>
-                                <TableHead>Borc</TableHead>
-                                <TableHead>Ödəniş</TableHead>
+                                <TableHead>Məbləğ</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -149,21 +148,16 @@ export function CustomerDetails({customerId, dateRange}: { customerId: string; d
                                             minute: "2-digit",
                                         })}
                                     </TableCell>
-                                    <TableCell className={transaction.eventType === 0 ? "text-red-600" : ""}>
-                                        {transaction.eventType === 0 ? (
-                                            <span className="flex items-center">
-                        <ArrowDownIcon className="mr-1" size={16}/>
-                                                {transaction.amount.toFixed(2)}₼
+                                    <TableCell
+                                        className={transaction.eventType === 0 ? "text-red-600" : "text-green-600"}>
+                                           <span className="flex items-center">
+                                               {transaction.eventType === 1
+                                                   ? <ArrowDownIcon className="mr-1" size={16}/>
+                                                   : <ArrowUpIcon className="mr-1" size={16}/>}
+
+                                               {transaction.amount.toFixed(2)}₼
                       </span>
-                                        ) : null}
-                                    </TableCell>
-                                    <TableCell className={transaction.eventType === 1 ? "text-green-600" : ""}>
-                                        {transaction.eventType === 1 ? (
-                                            <span className="flex items-center">
-                        <ArrowUpIcon className="mr-1" size={16}/>
-                                                {transaction.amount.toFixed(2)}₼
-                      </span>
-                                        ) : null}
+
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex space-x-2">
