@@ -4,121 +4,136 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+
+const formSchema = z.object({
+  amount: z.coerce.number().positive({
+    message: "Amount must be a positive number.",
+  }),
+  eventType: z.string(),
+  paymentDate: z.date(),
+})
 
 export function AddTransactionForm({ customerId, onTransactionAdded }) {
-  const [amount, setAmount] = useState(0)
-  const [eventType, setEventType] = useState("0")
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      amount: 0,
+      eventType: "0",
+      paymentDate: new Date(),
+    },
+  })
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true)
     try {
-      const response = await fetch(`/base-api/customer/${customerId}/${eventType == "0" ? "add-debt" : "pay-debt"}`, {
+      const endpoint = `/base-api/customer/${customerId}/${values.eventType === "0" ? "add-debt" : "pay-debt"}`
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerId,
-          amount,
-          eventType: Number.parseInt(eventType),
-          paymentDate,
+          amount: values.amount,
+          eventType: Number.parseInt(values.eventType),
+          paymentDate: values.paymentDate.toISOString(),
         }),
       })
+
       if (response.ok) {
+        form.reset()
         onTransactionAdded()
       } else {
-        console.error("Failed to add transaction")
+        throw new Error("Failed to add transaction")
       }
     } catch (error) {
       console.error("Error adding transaction:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(Number.parseFloat(e.target.value))}
-            placeholder="Amount"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="amount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Amount</FormLabel>
+              <FormControl>
+                <Input type="number" step="0.01" min="0.01" placeholder="0.00" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <Select value={eventType} onValueChange={setEventType}>
-          <SelectTrigger>
-            <SelectValue placeholder="Sec event type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="0">Borc elave et</SelectItem>
-            <SelectItem value="1">Odenis elave et</SelectItem>
-          </SelectContent>
-        </Select>
-        <Input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} />
-        <Button type="submit">Elave et</Button>
+
+        <FormField
+          control={form.control}
+          name="eventType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Transaction Type</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select transaction type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="0">Add Debt</SelectItem>
+                  <SelectItem value="1">Add Payment</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="paymentDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Date</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+                    >
+                      {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Adding..." : "Add Transaction"}
+        </Button>
       </form>
+    </Form>
   )
 }
 
-
-
-// "use client"
-//
-// import { useState } from "react"
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-// import { toast } from "@/components/ui/use-toast"
-//
-// interface AddTransactionFormProps {
-//   customerId: string
-//   onTransactionAdded: () => void
-// }
-//
-// export function AddTransactionForm({ customerId, onTransactionAdded }: AddTransactionFormProps) {
-//   const [amount, setAmount] = useState("")
-//   const [eventType, setEventType] = useState("0")
-//
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault()
-//     const response = await fetch(`/base-api/customer/${customerId}/${eventType == "0" ? "add-debt": "pay-debt"}`, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ amount: Number.parseFloat(amount), eventType: Number.parseInt(eventType) }),
-//     })
-//     const data = await response.json()
-//     if (data.isSuccess) {
-//       toast({ title: "Transaction added successfully" })
-//       setAmount("")
-//       onTransactionAdded()
-//     } else {
-//       toast({ title: "Error adding transaction", variant: "destructive" })
-//     }
-//   }
-//
-//   return (
-//     <form onSubmit={handleSubmit} className="space-y-4">
-//       <div>
-//         <Label htmlFor="amount">Məbləğ</Label>
-//         <Input
-//           id="amount"
-//           type="number"
-//           value={amount}
-//           onChange={(e) => setAmount(e.target.value)}
-//           required
-//           min="0.01"
-//           step="0.01"
-//         />
-//       </div>
-//       <RadioGroup value={eventType} onValueChange={setEventType}>
-//         <div className="flex items-center space-x-2">
-//           <RadioGroupItem value="0" id="debt" />
-//           <Label htmlFor="debt">Borc</Label>
-//         </div>
-//         <div className="flex items-center space-x-2">
-//           <RadioGroupItem value="1" id="payment" />
-//           <Label htmlFor="payment">Ödəniş</Label>
-//         </div>
-//       </RadioGroup>
-//       <Button type="submit">Əlavə et</Button>
-//     </form>
-//   )
-// }
-//

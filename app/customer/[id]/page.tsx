@@ -1,93 +1,27 @@
-"use client"
+import CustomerPage from "@/components/CustomerPage"
 
-import { useState } from "react"
-import { CustomerDetails } from "@/components/CustomerDetails"
-import { UpdateCustomerForm } from "@/components/UpdateCustomerForm"
-import { DateRangePicker } from "@/components/DateRangePicker"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
-import { addDays } from "date-fns"
-import {useRouter} from "next/navigation";
+// export async function generateStaticParams() {
+// const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/ids`,{
+//     method: "GET",
+//     headers: {
+//         "Content-Type": "application/json"
+//     },
+// })
+//
+// const customerIds = await response.json()
+// console.log("customerIds", customerIds)
+// // Return an array of params for all dynamic routes
+//
+// const params = [];
+// for (const id of customerIds.data) {
+//     params.push({ id: `${id}` });
+// }
+// return [];
+// }
 
-export default function CustomerPage({ params }: { params: { id: string } }) {
-  const [dateRange, setDateRange] = useState({
-    from: addDays(new Date(), -30),
-    to: new Date(),
-  })
-
-  const [isUpdateCustomerDialogOpen, setIsUpdateCustomerDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
-
-  const handleCustomerUpdated = () => {
-    setIsUpdateCustomerDialogOpen(false)
-    // You might want to refresh the customer details here
-  }
-
-  const handleDeleteCustomer = async () => {
-    setIsDeleting(true)
-    try {
-      const response = await fetch(`/base-api/customer/${params.id}`, {
-        method: "DELETE",
-      })
-      if (!response.ok) throw new Error("Failed to delete customer")
-      setIsDeleteDialogOpen(false)
-      // Eğer müşteri silindiyse, yönlendirme veya listeyi yenileme yapılabilir
-      router.push('/')// Silme sonrası yönlendirme
-    } catch (error) {
-      console.error("Error deleting customer:", error)
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  return (
-      <main className="container mx-auto p-4">
-        <div className="flex justify-between flex-col sm:flex-row items-center mb-6">
-          <DateRangePicker date={dateRange} setDate={setDateRange as any} />
-
-          <div className="flex space-x-4">
-            {/* Update Customer Dialog */}
-            <Dialog open={isUpdateCustomerDialogOpen} onOpenChange={setIsUpdateCustomerDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>Update Customer</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Update Customer</DialogTitle>
-                </DialogHeader>
-                <UpdateCustomerForm customerId={params.id} onCustomerUpdated={handleCustomerUpdated} />
-              </DialogContent>
-            </Dialog>
-
-            {/* Delete Customer Dialog */}
-            <Dialog  open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="destructive">Musterini sil </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Silmek istediyinize eminsiniz??</DialogTitle>
-                </DialogHeader>
-                <DialogFooter className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                      variant="destructive"
-                      onClick={handleDeleteCustomer}
-                      disabled={isDeleting}
-                  >
-                    {isDeleting ? "Silinir..." : "Beli, Sil"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-
-        <CustomerDetails customerId={params.id} dateRange={dateRange} />
-      </main>
-  )
+const Page = ({ params }) => {
+  return <CustomerPage params={params} />
 }
+
+export default Page
+

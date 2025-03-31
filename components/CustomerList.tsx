@@ -1,215 +1,277 @@
 "use client"
 
-import {useState} from "react"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
-import {Input} from "@/components/ui/input"
-import {Button} from "@/components/ui/button"
-import {Badge} from "@/components/ui/badge"
-import {Skeleton} from "@/components/ui/skeleton"
-import Link from "next/link"
-import {Search, ArrowUpDown, MoreHorizontal} from "lucide-react"
+import { useState } from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search, Eye, ArrowUpDown } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useRouter } from "next/navigation"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {useRouter} from "next/navigation";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { toast } from "@/components/ui/use-toast"
 
 interface Customer {
-    id: number
-    name: string
-    description: string
-    address: string | null
-    totalDebt: number,
-    customerId: number,
-    transactionId: number
+  id: number
+  name: string
+  description: string
+  address: string
+  currentDebt: number
+  totalDebt: number
+  totalPayment: number
 }
 
-export function CustomerList({customers, isLoading}: { customers: Customer[], isLoading: boolean }) {
+interface CustomerListProps {
+  customers: Customer[]
+  isLoading: boolean
+}
 
-    const [searchTerm, setSearchTerm] = useState("")
-    const [sortColumn, setSortColumn] = useState<keyof Customer>("name")
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-    const router = useRouter()
-    // Filter customers based on search input
+export function CustomerList({ customers, isLoading }: CustomerListProps) {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortField, setSortField] = useState<keyof Customer>("id")
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [deleteCustomerId, setDeleteCustomerId] = useState<number | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const router = useRouter()
 
-    const filteredCustomers = customers ?? [].filter(
-        (customer) =>
-            customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            customer?.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-
-
-    // Sort customers based on selected column and direction
-    const sortedCustomers = [...filteredCustomers].sort((a, b) => {
-        if (a[sortColumn] < b[sortColumn]) return sortDirection === "asc" ? -1 : 1
-        if (a[sortColumn] > b[sortColumn]) return sortDirection === "asc" ? 1 : -1
-        return 0
-    })
-
-    const handleSort = (column: keyof Customer) => {
-        if (column === sortColumn) {
-            setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-        } else {
-            setSortColumn(column)
-            setSortDirection("asc")
-        }
+  const handleSort = (field: keyof Customer) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
     }
+  }
 
+  const handleDeleteClick = (customerId: number) => {
+    setDeleteCustomerId(customerId)
+    setIsDeleteDialogOpen(true)
+  }
 
-    const handleViewDetails = (id: number) => {
-        router.push(`/customer/${id}`)
+  const handleDeleteConfirm = async () => {
+    if (!deleteCustomerId) return
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/base-api/customer/${deleteCustomerId}`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Customer deleted",
+          description: "The customer has been successfully deleted.",
+        })
+        // Refresh the page to update the customer list
+        window.location.reload()
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to delete the customer. Please try again.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteDialogOpen(false)
     }
+  }
 
-    const handleEditCustomer = (id: number) => {
-        console.log(`Edit customer with id: ${id}`)
-    }
+  const filteredCustomers = customers.filter(
+    (customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.address.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
-    const handleDeleteCustomer = (id: number) => {
-        if (window.confirm("Are you sure you want to delete this customer?")) {
-            console.log(`Delete customer with id: ${id}`)
-        }
-    }
+  const sortedCustomers = [...filteredCustomers].sort((a, b) => {
+    if (a[sortField] < b[sortField]) return sortDirection === "asc" ? -1 : 1
+    if (a[sortField] > b[sortField]) return sortDirection === "asc" ? 1 : -1
+    return 0
+  })
 
+  const getStatusBadge = (debt: number) => {
+    if (debt <= 0) return <Badge className="bg-green-500">Paid</Badge>
+    if (debt > 1000) return <Badge variant="destructive">High Debt</Badge>
+    return <Badge variant="outline">Active</Badge>
+  }
 
-    return (
-        <div className="container mx-auto px-4 py-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-                Müşteri Borç Durumu
-            </h1>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {sortedCustomers.map((customer) => (
-                    <Card key={customer.id}  className="shadow-lg p-4 flex justify-between items-center rounded-2xl">
-                        <CardContent className="w-full p-0 flex justify-between items-center">
-                            <Button variant="outline" onClick={()=>handleViewDetails(customer.id)} className="text-lg hover:cursor-pointer hover:text-blue-600 font-medium">{customer.name} {customer.address}</Button>
-                            <Badge
-                                className={`text-sm px-3 py-1 rounded-lg ${customer.currentDebt > 0 ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}
-                            >
-                                {customer.currentDebt <= 0 ?  "Ödendi" : `${customer.currentDebt} AZN`}
-                            </Badge>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+  return (
+    <Card className="shadow-md rounded-xl">
+      <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+        <CardTitle className="text-xl font-bold">Customers</CardTitle>
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search customers..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-    )
-    // return (
-    //     <Card>
-    //         <CardHeader>
-    //             <CardTitle className="text-2xl font-bold">Müstərilər</CardTitle>
-    //             <div className="flex items-center space-x-2">
-    //                 <Search className="w-4 h-4 text-gray-500"/>
-    //                 <Input
-    //                     placeholder="Search customers..."
-    //                     value={searchTerm}
-    //                     onChange={(e) => setSearchTerm(e.target.value)}
-    //                     className="max-w-sm"
-    //                 />
-    //             </div>
-    //         </CardHeader>
-    //         <CardContent>
-    //             <div className="rounded-md border">
-    //                 <Table>
-    //                     <TableHeader>
-    //                         <TableRow>
-    //                             <TableHead className="w-[80px]">ID</TableHead>
-    //                             <TableHead className="w-[250px]">
-    //                                 <Button variant="ghost" onClick={() => handleSort("name")}>
-    //                                     Ad
-    //                                     <ArrowUpDown className="ml-2 h-4 w-4"/>
-    //                                 </Button>
-    //                             </TableHead>
-    //                             <TableHead className="w-[150px]">
-    //                                 <Button variant="ghost" onClick={() => handleSort("totalDebt")}>
-    //                                     Ümumi Borcu
-    //                                     <ArrowUpDown className="ml-2 h-4 w-4"/>
-    //                                 </Button>
-    //                             </TableHead>
-    //                             <TableHead className="w-[250px]">Address</TableHead>
-    //                             <TableHead className="w-[150px] text-right"></TableHead>
-    //                             <TableHead className="w-[150px] text-center">Actions</TableHead>
-    //                         </TableRow>
-    //                     </TableHeader>
-    //                     <TableBody>
-    //                         {isLoading
-    //                             ? Array.from({length: 5}).map((_, index) => (
-    //                                 <TableRow key={index}>
-    //                                     <TableCell>
-    //                                         <Skeleton className="h-4 w-8"/>
-    //                                     </TableCell>
-    //                                     <TableCell>
-    //                                         <Skeleton className="h-4 w-[200px]"/>
-    //                                     </TableCell>
-    //                                     <TableCell>
-    //                                         <Skeleton className="h-4 w-[150px]"/>
-    //                                     </TableCell>
-    //                                     <TableCell>
-    //                                         <Skeleton className="h-4 w-[250px]"/>
-    //                                     </TableCell>
-    //                                     <TableCell>
-    //                                         <Skeleton className="h-4 w-16"/>
-    //                                     </TableCell>
-    //                                     <TableCell>
-    //                                         <Skeleton className="h-8 w-8 rounded-full"/>
-    //                                     </TableCell>
-    //                                 </TableRow>
-    //                             ))
-    //                             : sortedCustomers.map((customer) => (
-    //                                 <TableRow key={customer.id}>
-    //                                     <TableCell className="font-medium">{customer.id}</TableCell>
-    //                                     <TableCell>
-    //                                         <Link
-    //                                             href={`/customer/${customer.id}`}
-    //                                             className="font-semibold text-lg text-primary hover:underline"
-    //                                         >
-    //                                             {customer.name}
-    //                                         </Link>
-    //                                     </TableCell>
-    //                                     <TableCell>
-    //                                         <Badge className={"text-md"} variant={customer.totalDebt > 0 ? "destructive" : "secondary"}>
-    //                                             {customer.totalDebt.toFixed(2)}₼
-    //                                         </Badge>
-    //                                     </TableCell>
-    //                                     <TableCell>{customer.address || "N/A"}</TableCell>
-    //                                     <TableCell className="text-right flex space-x-2">
-    //                                         <Button variant="outline" size="sm" onClick={() => handleViewDetails(customer.id)}>
-    //                                             Detallar
-    //                                         </Button>
-    //                                     </TableCell>
-    //                                     <TableCell className={"text-center"}>
-    //                                         <DropdownMenu>
-    //                                             <DropdownMenuTrigger asChild>
-    //                                                 <Button variant="ghost" className="h-8 w-8 p-0">
-    //                                                     <span className="sr-only">Open menu</span>
-    //                                                     <MoreHorizontal className="h-4 w-4"/>
-    //                                                 </Button>
-    //                                             </DropdownMenuTrigger>
-    //                                             <DropdownMenuContent align="end">
-    //                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    //                                                 <DropdownMenuItem onClick={() => handleViewDetails(customer.id)}>
-    //                                                     View details
-    //                                                 </DropdownMenuItem>
-    //                                                 <DropdownMenuSeparator/>
-    //                                                 <DropdownMenuItem onClick={() => handleEditCustomer(customer.id)}>
-    //                                                     Edit customer
-    //                                                 </DropdownMenuItem>
-    //                                                 <DropdownMenuItem onClick={() => handleDeleteCustomer(customer.id)}>
-    //                                                     Delete customer
-    //                                                 </DropdownMenuItem>
-    //                                             </DropdownMenuContent>
-    //                                         </DropdownMenu>
-    //                                     </TableCell>
-    //                                 </TableRow>
-    //                             ))}
-    //                     </TableBody>
-    //                 </Table>
-    //             </div>
-    //         </CardContent>
-    //     </Card>
-    // )
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[80px]">
+                  <div className="flex items-center space-x-1 cursor-pointer" onClick={() => handleSort("id")}>
+                    <span>ID</span>
+                    {sortField === "id" && (
+                      <ArrowUpDown className={`h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead>
+                  <div className="flex items-center space-x-1 cursor-pointer" onClick={() => handleSort("name")}>
+                    <span>Name</span>
+                    {sortField === "name" && (
+                      <ArrowUpDown className={`h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead className="hidden md:table-cell">Description</TableHead>
+                <TableHead className="hidden md:table-cell">Address</TableHead>
+                <TableHead className="text-right">
+                  <div
+                    className="flex items-center justify-end space-x-1 cursor-pointer"
+                    onClick={() => handleSort("currentDebt")}
+                  >
+                    <span>Current Debt</span>
+                    {sortField === "currentDebt" && (
+                      <ArrowUpDown className={`h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead className="hidden md:table-cell text-right">Status</TableHead>
+                <TableHead className="text-right w-[100px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array(5)
+                  .fill(0)
+                  .map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Skeleton className="h-5 w-10" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-32" />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Skeleton className="h-5 w-40" />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Skeleton className="h-5 w-40" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-20 ml-auto" />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Skeleton className="h-5 w-20 ml-auto" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-8 w-20 ml-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : sortedCustomers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
+                    No customers found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                sortedCustomers.map((customer) => (
+                  <TableRow key={customer.id}>
+                    <TableCell className="font-medium">{customer.id}</TableCell>
+                    <TableCell>{customer.name}</TableCell>
+                    <TableCell className="hidden md:table-cell">{customer.description}</TableCell>
+                    <TableCell className="hidden md:table-cell">{customer.address}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      <span
+                        className={
+                          customer.currentDebt > 0
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-green-600 dark:text-green-400"
+                        }
+                      >
+                        {customer.currentDebt.toFixed(2)}₼
+                      </span>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-right">
+                      {getStatusBadge(customer.currentDebt)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Eye className="h-4 w-4" />
+                            <span className="sr-only">Actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => router.push(`/customer/${customer.id}`)}>
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+                            onClick={() => handleDeleteClick(customer.id)}
+                          >
+                            Delete Customer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the customer and all associated transactions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Card>
+  )
 }
+
